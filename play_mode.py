@@ -11,6 +11,7 @@ from zombie import Zombie
 
 # boy = None
 
+
 def handle_events():
     events = get_events()
     for event in events:
@@ -24,6 +25,8 @@ def handle_events():
 def init():
     global grass
     global boy
+    global balls
+    global zombie
 
     running = True
 
@@ -32,10 +35,15 @@ def init():
 
     boy = Boy()
     game_world.add_object(boy, 1)
+    game_world.add_collision_pair('boy:ball', boy, None)
 
-    # fill here
+    zombie = Zombie()
+    game_world.add_object(zombie, 1)
 
-
+    balls = [Ball(random.randint(100, 1500-100), 60, 0) for _ in range(30)]
+    game_world.add_objects(balls,1)
+    for ball in balls:
+        game_world.add_collision_pair('boy:ball', None, ball)
 
 def finish():
     game_world.clear()
@@ -44,7 +52,21 @@ def finish():
 
 def update():
     game_world.update()
-    # fill here
+    for ball in balls.copy():
+        if game_world.collide(boy, ball):
+            print('COLLISION boy:ball')
+        boy.ball_count += 1
+        game_world.remove_object(ball)
+        balls.remove(ball)
+        if game_world.collide(zombie, ball):
+            print('colllllllllldlldldldl')
+
+    if game_world.collide(boy, zombie):
+        quit()
+
+
+
+
 
 def draw():
     clear_canvas()
